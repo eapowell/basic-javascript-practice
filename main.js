@@ -1,112 +1,169 @@
-import { films } from '/assets/films.js'
-import { people } from '/assets/people.js'
+//import { senators } from "./senators.json">
 
+async function getAPIData(url) {
+    try {
+        const response = await fetch(url)
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error(error)
+    }
+}
+// return the async data
+let allSenators = []
+let simpleSenators = []
 
-
-console.log ('Hey, I am JavaScript on your page')
-
-let mainArea = document.querySelector('main')
-
-films.forEach(function(film) {
-
-    let filmDiv = document.createElement('div')
-    let title = document.createElement('h1')
-    let crawl = document.createElement('p')
-
-    filmDiv.appendChild(title)
-    filmDiv.appendChild(crawl)
-
-    title.textContent = film.title
-    crawl.innerText = film.opening_crawl
-
-    mainArea.appendChild(filmDiv)
-  })
-
-  people.forEach(function(person) {
-    let personDiv = document.createElement('div')
-    let name = document.createElement('h1')
-    let gender = document.createElement('h3')
-    let pic = document.createElement('img')
-
-    personDiv.appendChild(name)
-    personDiv.appendChild(gender)
-
-    let charNum = getCharNumber(person.url)
-    
-    name.textContent = person.name
-    gender.textContent = person.gender
-    pic.src = 'https://starwars-visualguide.com/assets/img/characters/${charNum}.jpg'
-
-    mainArea.appendChild(personDiv)
-
+const theData = getAPIData('senators.json').then(data => {
+    allSenators = data.results[0].members
+    populateDOM(allSenators)
+    get oldestSenator(simpleSenators)
+    simpleSenators = mapSenators(allSenators)
+    populateDOM(simpleSenators)
 })
 
-function getCharNumber(charURL) {
-  let end = charURL.lastIndexOf('/')
-  let charID = charURL.substring(end -2, end)
-  if(charID.indexOf('/') !== -1 ) {
-    return charID.slice(1,2)
-  } else {
-    return charID
-  }
-  }
 
+// whos republican? whos democrat?
 
+const republicans = allSenators.filter(senator => senator.party === 'R')
+const democrats = allSenators.filter(senator => senator.party === 'D')
+const independent = allSenators.filter(senator => senator.party === 'ID')
 
-const maleCharacters = people.filter(person => person.gender === "male")
-console.log(maleCharacters)
-const femaleCharacters = people.filter(person => person.gender === "female")
-console.log(femaleCharacters)
+console.log(republicans, democrats)
+console.log(simpleSenators)
 
+// map example
 
-
-
-
-
-
-
-
-
-
-
-
+function mapSenators(allSOfThem) {
+   const resultMap =allOfThem.map(senator => {
+    return {
+        id: senator.id,
+        name: '${senator.first_name} ${senator.last_name}',
+        party: senator.party,
+        birth_date: senator.date_of_birth, 
+        age: _calculateAge(new Date(senator.date_of.birth)),
+        gender: senator.gender
+    }
+})
+return resultMap
+}
 
 
 
 
 
 
+//reduce example
+
+const testArray = [5,10,15,20,25,30,35,40,45,50]
+
+const testReduce = testArray.reduce((acc, num) => {
+   return acc + num
+}, 0)
+
+function getOldestSenator(arrayOfSenators) {
+    return arrayOfSentators.reduce((acc, senator) => {
+        return (oldest.age || 0) > senator.age ? oldest : senator
+}, {})
+}
 
 
 
 
-  
-//let mainHeader = document.querySelector('h1')
-
-//console.log(mainHeader)
-
-//mainHeader.textContent = "Lizzy is the best!"
-//mainHeader.setAttribute("style", "color:red; border: 1px solid blue;");
-
-//let myBody = document.querySelector ('body')
-
-//document.body.setAttribute('style', "background-color: #343434;")
 
 
+const container = document.querySelector('.container')
 
-//let myParagraph = document.createElement("p")
-//myParagraph.textContent = "I am the best paragraph ever written"
+function populateDOM(senatorArray) {
+    senatorArray.forEach(senator => {
 
-//let myDiv = document.createElement('div')
-//myDiv.appendChild(myParagraph)
+    let card = document.createElement('div')
+    card.setAttribute('class', 'card')
+    let cardImage = document.createElement('div')
+    card.setAttribute('class', 'card-image')
+    let cardFIgure = document.createElement('figure')
+    cardFIgure.setAttribute('class', 'image is-4by3')
+    let figureImage = document.createElement('img')
+    figureImage.src = "https://www.congress.gov/img/member/${senator.id.toLowerCase()}_200.jpg"
+    figureImage.alt = "Placeholder_image"
 
-//myDiv.textContent = "Hey, I am a Div!"
+    cardFIgure.appendChild(figureImage)
+    cardImage.appendChild(cardFigure)
+    card.appendChild(cardImage)
+    card.appendChild(populateCardContent(senator))
+    container.appendChild(card)
 
-//document.body.appendChild(myDiv)
+    })
 
-//let myPic = document.createElement("img")
+}
 
-//myPic.setAttribute("src", "https://images2.minutemediacdn.com/image/upload/c_crop,h_2549,w_4536,x_0,y_237/f_auto,q_auto,w_1100/v1560186367/shape/mentalfloss/istock-687398754.jpg")
+function populateCardContent(senator) {
+    let cardContent = document.createElement('div')
+    cardContent.setAttribute('class', "card-content")
+    let media = document.createElement('div')
+    media.setAttribute('class', 'media')
+    let mediaLeft = document.createElement('div')
+    mediaLeft.setAttribute('class', 'media-left')
+    let figure = document.createElement('div')
+    figure.setAttribute('class', 'figure')
+    let figureImage = document.createElement('div')
+    if(senator.party === "R") {
+        figureImage.src = "/images/elephant.png"
+    }
+    if(senator.party === "D") {
+        figureImage.src = "/images/donkey.png"
+    } 
 
-//document.body.appendChild(myPic)
+    figureImage.setAttribute('class', 'image is-48x48')
+    let figureImage = document.createElement('div')
+    figureImage.src = "/img/elephant.png"
+    figureImage.alt = "Placeholder thumbnail"
+    let mediaContent = document.createElement('div')
+    mediaContent.setAttribute('class', 'media-content')
+    let titleP = document.createElement('p')
+    subtitleP.setAttribute('class', 'subtitle is-4')
+    let titleP = document.createElement('p')
+    subtitleP.setAttribute('class', 'subtitle is-6')
+    titleP.textContent = '${senator.name}'
 
+    let contentDiv = Document.createElement('div')
+    contentDiv.setAttribute('class', 'content')
+    contentDiv.textContent = 'Lorem ipsum dolar sit amet'
+    let contentBreak = document.createElement('br')
+    let timeSection = document.createElement('time')
+    let newDate = Date.now()
+    timeSection.dateTime = '${newDate}'
+    timeSection.textContent = '${newDate}'
+
+    mediaContent.appendChild(titleP)
+    mediaContent.appendChild(subtitleP)
+    figure.appendChild(figureImage)
+    mediaLeft.appendChild(figure)
+    media.textContent()
+    media.textContent()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
